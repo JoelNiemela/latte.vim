@@ -139,7 +139,7 @@ syn region  latteHtmlScript start=+<script\>\ze\_[^>]*\<type\s*=\s*["']\=text/\%
 hi def link latteDelimiter  Special
 hi def link latteTagName    Statement
 hi def link latteBlockKeyword latteTagName
-hi def link latteBlockName  Identifier
+hi def link latteBlockName  Function
 hi def link latteNAttr      latteTagName
 hi def link latteNAttrQuote latteDelimiter
 hi def link latteVariable   Identifier
