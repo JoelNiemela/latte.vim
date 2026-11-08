@@ -40,7 +40,7 @@ syn case match
 " ---------------------------------------------------------------------------
 " Expressions (used inside {tags} and n:attribute values)
 " ---------------------------------------------------------------------------
-syn cluster latteExprBase contains=latteVariable,latteNumber,latteConstant,latteKeyword,latteOperator,latteFunction,latteClass,latteComma,latteFilter,latteBraces,latteParens,latteBrackets
+syn cluster latteExprBase contains=latteVariable,latteNumber,latteConstant,latteKeyword,latteOperator,latteFunction,latteClass,latteType,latteComma,latteFilter,latteBraces,latteParens,latteBrackets
 syn cluster latteExpr     contains=@latteExprBase,latteStringS,latteStringD
 
 syn match   latteOperator contained +[-+*/%=<>!?:.&|~^@]+
@@ -54,16 +54,26 @@ syn region  latteStringD  contained start=+"+ skip=+\\\\\|\\"+ end=+"+ contains=
 syn match   latteConstant contained +\<\u[A-Z0-9_]\+\>\%(\s*(\|\\\|::\)\@!+
 " Class::CONSTANT, Enum::Case, Foo::class
 syn match   latteConstant contained +\%(::\)\@2<=\h\w*\>\%(\s*(\)\@!+
-syn keyword latteConstant contained true false null TRUE FALSE NULL
-syn keyword latteKeyword  contained as and or not xor in fn match
+" A match rather than a keyword, so that latteType can win for null|string.
+syn match   latteConstant contained +\c\<\%(true\|false\|null\)\>+
+syn keyword latteKeyword  contained as and or not xor in fn match clone
 syn keyword latteKeyword  contained new instanceof nextgroup=latteNewClass skipwhite
 
 syn match   latteFunction contained +\h\w*\ze\s*(+
 
-" Class names: \Kattis\Site, Kattis\Site, Site::..., new Foo, instanceof Foo
+" Class names: \App\Model\User, App\Model\User, User::..., new Foo, instanceof Foo
 syn match   latteClass    contained +\\\=\h\w*\%(\\\h\w*\)\+\%(\w\|\\\|\s*(\)\@!+
 syn match   latteClass    contained +\\\=\h\w*\%(\\\h\w*\)*\ze::+
 syn match   latteNewClass contained +\\\=\h\w*\%(\\\h\w*\)*+
+
+" Types, as in PHP: before a variable in a declaration ({define x, ?array
+" $data = null}, {var int $i = 0}, {varType int|string $x}, {parameters ...}),
+" in casts ((string) $x) and after {templateType}. Keywords such as 'as' in
+" {foreach $a as $b} win over this, since keywords take priority.
+syn match   latteType     contained +?\=\\\=\h\w*\%(\\\h\w*\)*\%(<[^<>$]*>\)\=\%(\s*[|&]\s*?\=\\\=\h\w*\%(\\\h\w*\)*\%(<[^<>$]*>\)\=\)*\ze\s\+\$\h+ contains=latteTypeOp
+syn match   latteType     contained +\%((\s*\)\@5<=\%(int\|integer\|bool\|boolean\|float\|double\|string\|array\|object\|binary\)\ze\s*)+
+syn match   latteTypeOp   contained +[?|&]+
+syn match   latteTemplateType contained +\\\=\h\w*\%(\\\h\w*\)*+
 
 " Named arguments: {include x, class: 'info'}, func($a, name: $v)
 syn match   latteComma    contained +,+ nextgroup=latteNamedArg skipwhite skipnl
@@ -96,6 +106,7 @@ syn match   latteTagName contained +\%({/\=\)\@2<=\h\w*\%(\w\|\s*(\)\@!+
 syn match   latteTagName contained +\%({\)\@1<=\%(block\|define\|include\|embed\|snippet\|snippetArea\|ifset\)\>\%(\s*(\)\@!+ nextgroup=latteBlockName,latteBlockKeyword skipwhite
 syn match   latteBlockName contained +#\=\h[[:alnum:]_-]*\%([[:alnum:]_-]\|\s*[(:\\]\)\@!+
 syn match   latteBlockKeyword contained +\<block\>\ze\s\+[$#[:alpha:]_]+ nextgroup=latteBlockName skipwhite
+syn match   latteTagName contained +\%({\)\@1<=templateType\>+ nextgroup=latteTemplateType skipwhite
 
 " {* comments *}
 syn region  latteComment start=+{\*+ end=+\*}+ contains=latteTodo,@Spell containedin=@latteContainedIn
@@ -152,6 +163,9 @@ hi def link latteOperator   Operator
 hi def link latteFunction   Function
 hi def link latteClass      Type
 hi def link latteNewClass   latteClass
+hi def link latteType       Type
+hi def link latteTypeOp     latteOperator
+hi def link latteTemplateType latteType
 hi def link latteNamedArg   Special
 hi def link latteFilter     Function
 hi def link latteFilterPipe latteOperator

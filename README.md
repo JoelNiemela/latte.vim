@@ -63,8 +63,9 @@ let g:latte_html_from_rtp = 1
 - Expressions inside tags: `$variables`, strings, numbers, `true/false/null`,
   keywords (`as`, `instanceof`, `new`, `fn`, `match` …), operators, `func()`
   calls, `|filters:args`, named arguments (`class: 'info'`), class names
-  (`\App\Model\User`, `Status::`) and constants (`Status::Active`,
-  `ENT_QUOTES`)
+  (`\App\Model\User`, `Status::`), constants (`Status::Active`,
+  `ENT_QUOTES`) and types, as in PHP (`{define row, ?array $data = null}`,
+  `{varType int|string $x}`, `{templateType App\Params}`, `(string) $x`)
 - `{* comments *}` (with `TODO`/`FIXME`/`XXX`/`NOTE`)
 - `n:attributes` and their values: `<li n:foreach="$items as $item">`
 - Latte tags inside attribute values, `<script>` and `<style>` (including CSS
@@ -103,8 +104,8 @@ let g:html_indent_inctags = 'p'
 The highlight groups are `latteDelimiter`, `latteTagName`, `latteBlockName`,
 `latteNAttr`, `latteVariable`, `latteStringS`/`latteStringD`, `latteNumber`,
 `latteConstant`, `latteKeyword`, `latteOperator`, `latteFunction`,
-`latteClass`, `latteNamedArg`, `latteFilter` and `latteComment`. For
-example:
+`latteClass`, `latteType`, `latteNamedArg`, `latteFilter` and
+`latteComment`. For example:
 
 ```vim
 hi link latteDelimiter PreProc
